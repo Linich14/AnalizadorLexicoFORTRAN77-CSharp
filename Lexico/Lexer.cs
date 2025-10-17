@@ -1,0 +1,180 @@
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace AnalizadorLexico.Lexico
+{
+
+    /// <summary>
+    /// Clase que implementa un analizador léxico para un subconjunto de FORTRAN77.
+    /// Esta clase toma el código fuente como entrada y genera una secuencia de tokens.
+    /// </summary>
+    public sealed class Lexer
+    {
+        private readonly string _codigoFuente;
+        private int _posicion;
+        private int _linea = 1;
+        private int _columna = 1;
+
+        /// <summary>
+        /// Palabras reservadas de FORTRAN77. 
+        /// </summary>
+        private static readonly HashSet<string> Reservadas = new(
+            new[] { "IF", "THEN", "ELSE", "END", "DO", "CONTINUE", "GOTO", "STOP" });
+
+
+
+        /// <summary>
+        /// Inicializa una nueva instancia del analizador léxico con el código fuente proporcionado.
+        /// </summary>
+        /// <param name="codigoFuente">Código fuente a analizar.</param>
+        public Lexer(string codigoFuente) => _codigoFuente = codigoFuente ?? string.Empty;
+
+
+
+        /// <summary>
+        /// Tokeniza el código fuente y genera una secuencia de tokens.
+        /// </summary>
+        /// <returns>Secuencia de tokens generados.</returns>
+        public IEnumerable<Token> Tokenizar()
+        {
+            while (!EsFin())
+            {
+                var caracter = CaracterActual();
+                if (char.IsWhiteSpace(caracter))
+                {
+                    if (caracter == '\n') { EmitirFinDeLinea(); Avanzar(); continue; }
+                    Avanzar();
+                    continue;
+                }
+
+                if (char.IsLetter(caracter))
+                {
+                    yield return LeerIdentificadorOPalabraReservada();
+                    continue;
+                }
+
+                if (char.IsDigit(caracter) || (caracter == '.' && SiguienteEsDigito()))
+                {
+                    yield return LeerNumero();
+                    continue;
+                }
+
+                switch (caracter)
+                {
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/':
+                        yield return Emitir(TipoToken.OperadorAritmetico, caracter.ToString()); Avanzar(); break;
+                    case '=':
+                        yield return Emitir(TipoToken.Asignacion, "="); Avanzar(); break;
+                    case '(':
+                        yield return Emitir(TipoToken.ParentesisApertura, "("); Avanzar(); break;
+                    case ')':
+                        yield return Emitir(TipoToken.ParentesisCierre, ")"); Avanzar(); break;
+                    case ',':
+                        yield return Emitir(TipoToken.Coma, ","); Avanzar(); break;
+                    default:
+                        yield return Emitir(TipoToken.Desconocido, caracter.ToString()); Avanzar(); break;
+                }
+            }
+
+            yield return new Token(TipoToken.EOF, string.Empty, _linea, _columna);
+        }
+
+
+        /// <summary>
+        /// Lee un identificador o una palabra reservada del código fuente.
+        /// </summary>
+        /// <returns>Retorna un token que representa el identificador o la palabra reservada.</returns>
+        private Token LeerIdentificadorOPalabraReservada()
+        {
+            var columnaInicio = _columna;
+            var constructorCadena = new StringBuilder();
+            //Mientras sea letra o dígito o _
+            while (!EsFin() && (char.IsLetterOrDigit(CaracterActual()) || CaracterActual() == '_'))
+            {
+                //agrega el caracter actual al StringBuilder
+                constructorCadena.Append(CaracterActual());
+                Avanzar();
+            }
+            //transforma el StringBuilder a mayúsculas
+            var lexema = constructorCadena.ToString().ToUpperInvariant();
+            //determina si es palabra reservada o identificador
+            var tipo = Reservadas.Contains(lexema) ? TipoToken.PalabraReservada : TipoToken.Identificador;
+            //retorna el token correspondiente
+            return new Token(tipo, lexema, _linea, columnaInicio);
+        }
+
+
+        /// <summary>
+        /// Lee un número (entero o real) del código fuente.
+        /// </summary>
+        private Token LeerNumero()
+        {
+            var columnaInicio = _columna;
+            var constructorCadena = new StringBuilder();
+            bool tienePunto = false;
+
+            //Mientras no sea el fin del código fuente
+            while (!EsFin())
+            {
+                var caracter = CaracterActual();
+                // si es un dígito, lo agrega al StringBuilder
+                if (char.IsDigit(caracter)) { constructorCadena.Append(caracter); Avanzar(); }
+                // sino si es un punto y no se ha encontrado otro punto antes, lo agrega
+                else if (caracter == '.' && !tienePunto) { tienePunto = true; constructorCadena.Append(caracter); Avanzar(); }
+                else break;
+            }
+
+            var lexema = constructorCadena.ToString();
+            // determina si es un número entero o real
+            var tipo = tienePunto ? TipoToken.NumeroReal : TipoToken.NumeroEntero;
+            //devuelve el token correspondiente
+            return new Token(tipo, lexema, _linea, columnaInicio);
+        }
+
+
+        /// <summary>
+        /// Verifica si el siguiente carácter es un dígito.
+        /// </summary>
+        private bool SiguienteEsDigito() => (_posicion + 1 < _codigoFuente.Length) && char.IsDigit(_codigoFuente[_posicion + 1]);
+
+        /// <summary>
+        ///  Emite un token de fin de línea (EOL).
+        /// </summary>
+        private void EmitirFinDeLinea() { /* opcional: emitir EOL visible si se requiere */ }
+
+
+        /// <summary>
+        /// Crea un nuevo token con el tipo y lexema especificados. 
+        /// </summary>
+        private Token Emitir(TipoToken tipo, string lexema) => new(tipo, lexema, _linea, _columna);
+
+
+        /// <summary>
+        /// Obtiene el carácter actual en la posición del analizador léxico.
+        /// </summary>
+        /// <returns>devuelve el carácter actual.</returns>
+        private char CaracterActual() => _codigoFuente[_posicion];
+
+        
+        /// <summary>
+        /// Verifica si se ha alcanzado el fin del código fuente.
+        /// </summary>
+        /// <returns>true si se ha alcanzado el fin; de lo contrario, false.</returns>
+        private bool EsFin() => _posicion >= _codigoFuente.Length;
+
+        /// <summary>
+        /// Avanza la posición del analizador léxico al siguiente carácter.
+        /// </summary>
+        private void Avanzar()
+        {
+            if (EsFin()) return;
+            if (_codigoFuente[_posicion] == '\n') { _linea++; _columna = 1; _posicion++; return; }
+            _posicion++; _columna++;
+        }
+    }
+
+}

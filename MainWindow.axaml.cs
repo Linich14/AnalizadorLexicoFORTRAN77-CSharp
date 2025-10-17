@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using AnalizadorLexico.Lexico;
 using AnalizadorLexico.Sintaxis;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AnalizadorLexico;
 
@@ -18,8 +19,8 @@ public partial class MainWindow : Window
         // Obtener texto de InputTextBox
         string input = this.FindControl<TextBox>("InputTextBox")?.Text ?? "";
         // Tokenizar
-        Tokenizador tokenizador = new Tokenizador();
-        List<Token> tokens = tokenizador.Tokenizar(input);
+        var lexer = new Lexer(input);
+        var tokens = lexer.Tokenizar().ToList();
         // Parsear
         ParserLL1 parser = new ParserLL1();
         ArbolSintactico arbol = parser.Parsear(tokens);
