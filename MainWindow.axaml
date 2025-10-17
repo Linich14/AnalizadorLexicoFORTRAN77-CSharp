@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AnalizadorLexico.MainWindow"
+        Title="Analizador Léxico y Sintáctico FORTRAN77">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <TextBlock Grid.Row="0" Text="Código Fuente FORTRAN77:" Margin="10"/>
+        <TextBox Grid.Row="1" Name="InputTextBox" AcceptsReturn="True" TextWrapping="Wrap" Margin="10"/>
+        <Button Grid.Row="2" Name="AnalyzeButton" Content="Analizar" HorizontalAlignment="Center" Margin="10" Click="AnalyzeButton_Click"/>
+        <TextBlock Grid.Row="3" Name="OutputTextBlock" Text="Resultados aparecerán aquí..." Margin="10" TextWrapping="Wrap"/>
+    </Grid>
+</Window>
