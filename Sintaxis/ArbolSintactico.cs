@@ -82,6 +82,59 @@ namespace AnalizadorLexico.Sintaxis
         }
     }
 
+    public class If : NodoSintactico
+    {
+        public override string Tipo => "If";
+        public Expresion Condicion { get; }
+        public List<NodoSintactico> SentenciasThen { get; }
+        public List<NodoSintactico> SentenciasElse { get; }
+
+        public If(Expresion condicion, List<NodoSintactico> sentenciasThen, List<NodoSintactico>? sentenciasElse = null)
+        {
+            Condicion = condicion;
+            SentenciasThen = sentenciasThen;
+            SentenciasElse = sentenciasElse ?? new List<NodoSintactico>();
+        }
+    }
+
+    public class DoLoop : NodoSintactico
+    {
+        public override string Tipo => "DoLoop";
+        public string Label { get; }
+        public string Identificador { get; }
+        public Expresion Inicio { get; }
+        public Expresion Fin { get; }
+        public Expresion? Incremento { get; }
+        public List<NodoSintactico> Sentencias { get; }
+
+        public DoLoop(string label, string identificador, Expresion inicio, Expresion fin, 
+                     List<NodoSintactico> sentencias, Expresion? incremento = null)
+        {
+            Label = label;
+            Identificador = identificador;
+            Inicio = inicio;
+            Fin = fin;
+            Incremento = incremento;
+            Sentencias = sentencias;
+        }
+    }
+
+        public class Declaracion : NodoSintactico
+        {
+            public override string Tipo => "Declaracion";
+            public string TipoDato { get; }
+            public string Identificador { get; }
+
+            public Declaracion(string tipoDato, string identificador)
+            {
+                TipoDato = tipoDato;
+                Identificador = identificador;
+            }
+        }
+
+
+
+
     /// <summary>
     /// Representa el árbol sintáctico completo.
     /// </summary>

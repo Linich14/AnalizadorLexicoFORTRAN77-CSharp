@@ -6,6 +6,7 @@ public enum TipoToken
     NumeroEntero,
     NumeroReal,
     OperadorAritmetico,   // + - * /
+    OperadorRelacional,   // .GT. .LT. .EQ. .NE. .GE. .LE.
     Asignacion,           // =
     ParentesisApertura,   // (
     ParentesisCierre,     // )

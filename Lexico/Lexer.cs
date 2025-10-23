@@ -20,7 +20,8 @@ namespace AnalizadorLexico.Lexico
         /// Palabras reservadas de FORTRAN77. 
         /// </summary>
         private static readonly HashSet<string> Reservadas = new(
-            new[] { "IF", "THEN", "ELSE", "END", "DO", "CONTINUE", "GOTO", "STOP" });
+            new[] { "IF", "THEN", "ELSE", "ENDIF", "END", "DO", "CONTINUE", "GOTO", "STOP", 
+                    "INTEGER", "REAL", "PROGRAM", "PRINT", "TO" });
 
 
 
@@ -46,6 +47,17 @@ namespace AnalizadorLexico.Lexico
                     if (caracter == '\n') { EmitirFinDeLinea(); Avanzar(); continue; }
                     Avanzar();
                     continue;
+                }
+
+                // Reconocer operadores relacionales de FORTRAN77: .GT., .LT., etc.
+                if (caracter == '.' && !SiguienteEsDigito())
+                {
+                    var opRelacional = LeerOperadorRelacional();
+                    if (opRelacional != null)
+                    {
+                        yield return opRelacional;
+                        continue;
+                    }
                 }
 
                 if (char.IsLetter(caracter))
@@ -105,6 +117,51 @@ namespace AnalizadorLexico.Lexico
             var tipo = Reservadas.Contains(lexema) ? TipoToken.PalabraReservada : TipoToken.Identificador;
             //retorna el token correspondiente
             return new Token(tipo, lexema, _linea, columnaInicio);
+        }
+
+
+        /// <summary>
+        /// Lee un operador relacional de FORTRAN77 (.GT., .LT., .EQ., .NE., .GE., .LE.)
+        /// </summary>
+        /// <returns>Token del operador relacional, o null si no es un operador válido.</returns>
+        private Token? LeerOperadorRelacional()
+        {
+            if (CaracterActual() != '.') return null;
+            
+            var columnaInicio = _columna;
+            var posicionInicio = _posicion;
+            var constructorCadena = new StringBuilder();
+            
+            // Leer el punto inicial
+            constructorCadena.Append(CaracterActual());
+            Avanzar();
+            
+            // Leer letras dentro del operador
+            while (!EsFin() && char.IsLetter(CaracterActual()))
+            {
+                constructorCadena.Append(CaracterActual());
+                Avanzar();
+            }
+            
+            // Verificar punto final
+            if (!EsFin() && CaracterActual() == '.')
+            {
+                constructorCadena.Append(CaracterActual());
+                Avanzar();
+                
+                var lexema = constructorCadena.ToString().ToUpperInvariant();
+                // Validar si es un operador relacional conocido
+                if (lexema == ".GT." || lexema == ".LT." || lexema == ".EQ." || 
+                    lexema == ".NE." || lexema == ".GE." || lexema == ".LE.")
+                {
+                    return new Token(TipoToken.OperadorRelacional, lexema, _linea, columnaInicio);
+                }
+            }
+            
+            // Si no es un operador válido, retroceder
+            _posicion = posicionInicio;
+            _columna = columnaInicio;
+            return null;
         }
 
 
