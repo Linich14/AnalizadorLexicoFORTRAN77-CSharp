@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AnalizadorLexico.UI.Views.BienvenidaView">
+    <StackPanel Margin="50" Spacing="30" VerticalAlignment="Center">
+        <TextBlock Text="ANALIZADOR LEXICO Y SINTACTICO"
+                  FontSize="28"
+                  FontWeight="Bold"
+                  Foreground="#2D3748"
+                  HorizontalAlignment="Center"
+                  TextWrapping="Wrap"/>
+
+        <TextBlock Text="FORTRAN77"
+                  FontSize="18"
+                  FontWeight="SemiBold"
+                  Foreground="#4A5568"
+                  HorizontalAlignment="Center"/>
+
+        <Separator Background="#E2E8F0" Margin="100,0"/>
+
+        <TextBlock Text="Selecciona una opción del menú lateral para comenzar:"
+                  FontSize="16"
+                  Foreground="#4A5568"
+                  HorizontalAlignment="Center"
+                  TextWrapping="Wrap"/>
+
+        <StackPanel HorizontalAlignment="Center" Spacing="30" Margin="0,20">
+            <Border BorderBrush="#E2E8F0" BorderThickness="2" CornerRadius="10" Padding="20" Background="#F7FAFC">
+                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="📁" FontSize="32" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Cargar Archivo" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Analizar codigo desde archivo" FontSize="12" Foreground="#718096" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#E2E8F0" BorderThickness="2" CornerRadius="10" Padding="20" Background="#F7FAFC">
+                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="🔍" FontSize="32" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Analizar Expresion" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Probar expresiones individuales" FontSize="12" Foreground="#718096" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#E2E8F0" BorderThickness="2" CornerRadius="10" Padding="20" Background="#F7FAFC">
+                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="🌳" FontSize="32" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Arbol Sintactico" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Visualizar estructura del codigo" FontSize="12" Foreground="#718096" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <TextBlock Text="Proyecto de Análisis de Lenguajes de Programación"
+                  FontSize="12"
+                  Foreground="#A0AEC0"
+                  HorizontalAlignment="Center"
+                  Margin="0,30,0,0"/>
+
+        <TextBlock Text="Implementa analisis lexico y sintactico para un subconjunto de FORTRAN77"
+                  FontSize="11"
+                  Foreground="#A0AEC0"
+                  HorizontalAlignment="Center"
+                  TextWrapping="Wrap"/>
+    </StackPanel>
+</UserControl>

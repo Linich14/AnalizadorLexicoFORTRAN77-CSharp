@@ -1,0 +1,142 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AnalizadorLexico.UI.MenuLateral"
+             Width="250"
+             Background="#2D3748">
+    <Border BorderBrush="#4A5568" BorderThickness="0,0,1,0">
+        <StackPanel Margin="0,20,0,0">
+            <!-- Título -->
+            <TextBlock Text="ANALIZADOR LEXICO"
+                      FontSize="16"
+                      FontWeight="Bold"
+                      Foreground="White"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,30"/>
+
+            <!-- Menú de opciones -->
+            <StackPanel Margin="10,0">
+
+                <!-- Cargar Archivo -->
+                <Button Name="LoadFileButton"
+                        Content="Cargar Archivo"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Margin="0,5"
+                        Padding="15,10"
+                        Background="#4A5568"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="5"
+                        FontSize="14">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#5A6578"/>
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Background" Value="#2D3748"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <!-- Analizar Expresión -->
+                <Button Name="AnalyzeExpressionButton"
+                        Content="Analizar Expresion"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Margin="0,5"
+                        Padding="15,10"
+                        Background="#4A5568"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="5"
+                        FontSize="14">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#5A6578"/>
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Background" Value="#2D3748"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <!-- Visualizar Árbol -->
+                <Button Name="ViewTreeButton"
+                        Content="Arbol Sintactico"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Margin="0,5"
+                        Padding="15,10"
+                        Background="#4A5568"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="5"
+                        FontSize="14">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#5A6578"/>
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Background" Value="#2D3748"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <!-- Separador -->
+                <Separator Margin="0,20" Background="#4A5568"/>
+
+                <!-- Extras -->
+                <TextBlock Text="EXTRAS"
+                          FontSize="12"
+                          FontWeight="Bold"
+                          Foreground="#A0AEC0"
+                          Margin="15,10,0,10"/>
+
+                <!-- Tema Claro/Oscuro -->
+                <Button Name="ThemeToggleButton"
+                        Content="Tema Oscuro"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Margin="0,5"
+                        Padding="15,10"
+                        Background="#4A5568"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="5"
+                        FontSize="14">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#5A6578"/>
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Background" Value="#2D3748"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <!-- Cerrar Aplicación -->
+                <Button Name="ExitButton"
+                        Content="Cerrar"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Margin="0,5"
+                        Padding="15,10"
+                        Background="#E53E3E"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="5"
+                        FontSize="14">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#FC8181"/>
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Background" Value="#C53030"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>
