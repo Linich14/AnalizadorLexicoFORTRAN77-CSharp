@@ -1,39 +1,70 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AnalizadorLexico.UI.Views"
              x:Class="AnalizadorLexico.UI.Views.CargarArchivoView">
     <StackPanel Margin="30" Spacing="20">
         <TextBlock Text="Cargar Archivo FORTRAN77"
                   FontSize="24"
                   FontWeight="Bold"
-                  Foreground="#2D3748"
+                  Foreground="White"
                   HorizontalAlignment="Center"/>
 
         <TextBlock Text="Selecciona un archivo .txt o .f77 para analizar:"
                   FontSize="14"
-                  Foreground="#4A5568"
+                  Foreground="#CBD5E0"
                   TextWrapping="Wrap"
                   HorizontalAlignment="Center"/>
 
-        <Button Name="SelectFileButton"
-                Content="Seleccionar Archivo"
-                HorizontalAlignment="Center"
-                Padding="20,10"
-                Background="#3182CE"
-                Foreground="White"
-                BorderThickness="0"
-                CornerRadius="5"
-                FontSize="16">
-            <Button.Styles>
-                <Style Selector="Button:pointerover">
-                    <Setter Property="Background" Value="#2C5282"/>
-                </Style>
-                <Style Selector="Button:pressed">
-                    <Setter Property="Background" Value="#1A365D"/>
-                </Style>
-            </Button.Styles>
-        </Button>
+        <!-- Panel de archivos disponibles -->
+        <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
+            <StackPanel Margin="10">
+                <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+                    <TextBlock Text="Archivos disponibles en carpeta 'input':"
+                              FontSize="14"
+                              FontWeight="SemiBold"
+                              Foreground="White"
+                              VerticalAlignment="Center"/>
+                    <Button x:Name="BtnRefresh"
+                            Content="🔄 Refrescar"
+                            Grid.Column="1"
+                            Padding="10,5"
+                            Background="#E53E3E"
+                            Foreground="White"
+                            BorderThickness="0"
+                            CornerRadius="3"
+                            FontSize="12">
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#C53030"/>
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Background" Value="#9B2C2C"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </Grid>
 
-        <TextBlock Name="SelectedFileText"
+                <ListBox x:Name="LstFiles"
+                        Height="150"
+                        Background="Transparent"
+                        BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="local:InformacionArchivo">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="{Binding Nombre}"
+                                          FontFamily="Consolas"
+                                          FontSize="12"/>
+                                <TextBlock Text="{Binding Tamanio, StringFormat='({0} bytes)'}"
+                                          FontSize="10"
+                                          Foreground="#718096"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <TextBlock x:Name="TxtSelectedFile"
                   Text="Ningún archivo seleccionado"
                   FontSize="12"
                   Foreground="#718096"
@@ -45,11 +76,11 @@
         <TextBlock Text="Contenido del Archivo:"
                   FontSize="16"
                   FontWeight="SemiBold"
-                  Foreground="#2D3748"/>
+                  Foreground="White"/>
 
         <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
             <ScrollViewer Height="300">
-                <TextBox Name="FileContentTextBox"
+                <TextBox x:Name="TxtFileContent"
                         IsReadOnly="True"
                         TextWrapping="Wrap"
                         FontFamily="Consolas"
@@ -60,8 +91,8 @@
             </ScrollViewer>
         </Border>
 
-        <Button Name="AnalyzeFileButton"
-                Content="Analizar Archivo"
+        <Button x:Name="BtnLoadFile"
+                Content="📁 Cargar Archivo"
                 HorizontalAlignment="Center"
                 Padding="15,8"
                 Background="#38A169"

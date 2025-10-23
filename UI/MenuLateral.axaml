@@ -6,7 +6,7 @@
     <Border BorderBrush="#4A5568" BorderThickness="0,0,1,0">
         <StackPanel Margin="0,20,0,0">
             <!-- Título -->
-            <TextBlock Text="ANALIZADOR LEXICO"
+            <TextBlock Text="Opciones"
                       FontSize="16"
                       FontWeight="Bold"
                       Foreground="White"
@@ -17,7 +17,7 @@
             <StackPanel Margin="10,0">
 
                 <!-- Cargar Archivo -->
-                <Button Name="LoadFileButton"
+                <Button x:Name="LoadFileButton"
                         Content="Cargar Archivo"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -39,7 +39,7 @@
                 </Button>
 
                 <!-- Analizar Expresión -->
-                <Button Name="AnalyzeExpressionButton"
+                <Button x:Name="AnalyzeExpressionButton"
                         Content="Analizar Expresion"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -61,7 +61,7 @@
                 </Button>
 
                 <!-- Visualizar Árbol -->
-                <Button Name="ViewTreeButton"
+                <Button x:Name="ViewTreeButton"
                         Content="Arbol Sintactico"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -93,7 +93,7 @@
                           Margin="15,10,0,10"/>
 
                 <!-- Tema Claro/Oscuro -->
-                <Button Name="ThemeToggleButton"
+                <Button x:Name="ThemeToggleButton"
                         Content="Tema Oscuro"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -115,7 +115,7 @@
                 </Button>
 
                 <!-- Cerrar Aplicación -->
-                <Button Name="ExitButton"
+                <Button x:Name="ExitButton"
                         Content="Cerrar"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -137,6 +137,23 @@
                 </Button>
 
             </StackPanel>
+
+            <!-- Información del archivo cargado -->
+            <Border BorderBrush="#4A5568" BorderThickness="0,1,0,0" Margin="10,20,10,10" Padding="0,10,0,0">
+                <StackPanel>
+                    <TextBlock Text="Archivo Cargado:"
+                              FontSize="12"
+                              FontWeight="SemiBold"
+                              Foreground="#CBD5E0"
+                              Margin="0,0,0,5"/>
+                    <TextBlock x:Name="LoadedFileText"
+                              Text="Ningún archivo cargado"
+                              FontSize="11"
+                              Foreground="#A0AEC0"
+                              TextWrapping="Wrap"
+                              Margin="0,0,0,5"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </Border>
 </UserControl>

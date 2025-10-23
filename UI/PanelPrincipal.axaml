@@ -1,9 +1,12 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AnalizadorLexico.UI.PanelPrincipal">
-    <Border Background="#F7FAFC" CornerRadius="8" Margin="20">
-        <ContentControl Name="AreaContenido"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"/>
+    <Border Background="#1A202C" CornerRadius="8" Margin="20">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                     VerticalScrollBarVisibility="Auto">
+            <ContentControl Name="ContentArea"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"/>
+        </ScrollViewer>
     </Border>
 </UserControl>

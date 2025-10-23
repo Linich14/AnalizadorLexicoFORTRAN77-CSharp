@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-
+using System;
 namespace AnalizadorLexico;
 
 public partial class App : Application

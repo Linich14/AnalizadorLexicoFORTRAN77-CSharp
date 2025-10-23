@@ -5,15 +5,15 @@
         xmlns:ui="clr-namespace:AnalizadorLexico.UI"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
         x:Class="AnalizadorLexico.MainWindow"
-        Title="Analizador Lexico y Sintactico FORTRAN77"
+        Title="Analizador Léxico y Sintáctico"
         Width="1200"
         Height="700"
         WindowStartupLocation="CenterScreen">
     <Grid ColumnDefinitions="Auto,*">
         <!-- Menú Lateral -->
-        <ui:MenuLateral Grid.Column="0" Name="MenuLateral"/>
+        <ui:MenuLateral Grid.Column="0" x:Name="MenuLateral"/>
 
         <!-- Panel Principal -->
-        <ui:PanelPrincipal Grid.Column="1" Name="PanelPrincipal"/>
+        <ui:PanelPrincipal Grid.Column="1" x:Name="PanelPrincipal"/>
     </Grid>
 </Window>

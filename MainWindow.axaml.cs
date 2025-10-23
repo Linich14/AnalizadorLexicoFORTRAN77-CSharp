@@ -1,73 +1,69 @@
 using Avalonia.Controls;
 using AnalizadorLexico.UI.Views;
+using System.IO;
+using System;
 
 namespace AnalizadorLexico;
 
 public partial class MainWindow : Window
 {
+    public string? ArchivoCargado { get; private set; }
+    public string? ContenidoArchivoCargado { get; private set; }
     public MainWindow()
     {
         InitializeComponent();
-        MostrarVistaBienvenida();
-        ConfigurarEventosMenu();
+        
+        // Usar Opened en lugar de AttachedToVisualTree
+        this.Opened += (s, e) =>
+        {
+            ConfigurarEventosMenu();
+            MostrarVistaBienvenida();
+        };
     }
 
     private void ConfigurarEventosMenu()
     {
         if (MenuLateral == null || PanelPrincipal == null)
+        {
             return;
+        }
 
-        // Evento para cargar archivo
-        var botonCargarArchivo = MenuLateral.FindControl<Button>("LoadFileButton");
-        if (botonCargarArchivo != null)
-            botonCargarArchivo.Click += (sender, e) =>
-            {
-                MostrarVistaCargarArchivo();
-            };
-
-        // Evento para analizar expresión
-        var botonAnalizarExpresion = MenuLateral.FindControl<Button>("AnalyzeExpressionButton");
-        if (botonAnalizarExpresion != null)
-            botonAnalizarExpresion.Click += (sender, e) =>
-            {
-                MostrarVistaAnalizarExpresion();
-            };
-
-        // Evento para visualizar árbol
-        var botonArbolSintactico = MenuLateral.FindControl<Button>("ViewTreeButton");
-        if (botonArbolSintactico != null)
-            botonArbolSintactico.Click += (sender, e) =>
-            {
-                MostrarVistaArbolSintactico();
-            };
-
-        // Evento para alternar tema
-        var botonAlternarTema = MenuLateral.FindControl<Button>("ThemeToggleButton");
-        if (botonAlternarTema != null)
-            botonAlternarTema.Click += (sender, e) =>
-            {
-                AlternarTema();
-            };
-
-        // Evento para cerrar aplicación
-        var botonCerrar = MenuLateral.FindControl<Button>("ExitButton");
-        if (botonCerrar != null)
-            botonCerrar.Click += (sender, e) =>
-            {
-                Close();
-            };
+        // Configurar eventos usando los eventos del MenuLateral
+        MenuLateral.OnLoadFileClicked += () => {
+            MostrarVistaCargarArchivo();
+        };
+        MenuLateral.OnAnalyzeExpressionClicked += () => {
+            MostrarVistaAnalizarExpresion();
+        };
+        MenuLateral.OnViewTreeClicked += () => {
+            MostrarVistaArbolSintactico();
+        };
+        MenuLateral.OnThemeToggleClicked += () => {
+            AlternarTema();
+        };
+        MenuLateral.OnExitClicked += () => Close();
     }
 
     private void MostrarVistaBienvenida()
     {
         if (PanelPrincipal?.AreaContenido != null)
-            PanelPrincipal.AreaContenido.Content = new BienvenidaView();
+        {
+            var vista = new BienvenidaView();
+            PanelPrincipal.AreaContenido.Content = vista;
+        }
+        else
+        {
+            Console.WriteLine("No se pudo asignar vista Bienvenida - PanelPrincipal o AreaContenido es null");
+        }
     }
 
     private void MostrarVistaCargarArchivo()
     {
         if (PanelPrincipal?.AreaContenido != null)
-            PanelPrincipal.AreaContenido.Content = new CargarArchivoView();
+        {
+            var vista = new CargarArchivoView();
+            PanelPrincipal.AreaContenido.Content = vista;
+        }
     }
 
     private void MostrarVistaAnalizarExpresion()
@@ -84,16 +80,53 @@ public partial class MainWindow : Window
 
     private void AlternarTema()
     {
-        var botonTema = MenuLateral.FindControl<Button>("ThemeToggleButton");
+        var botonTema = MenuLateral?.FindControl<Button>("ThemeToggleButton");
         if (botonTema != null && botonTema.Content != null)
         {
-            if (botonTema.Content.ToString().Contains("Oscuro"))
+            if (botonTema.Content.ToString()?.Contains("Oscuro") == true)
             {
                 botonTema.Content = "Tema Claro";
             }
             else
             {
                 botonTema.Content = "Tema Oscuro";
+            }
+        }
+    }
+
+    public void CargarArchivo(string rutaArchivo)
+    {
+        try
+        {
+            ArchivoCargado = Path.GetFileName(rutaArchivo);
+            ContenidoArchivoCargado = File.ReadAllText(rutaArchivo);
+
+            // Actualizar el panel lateral con información del archivo
+            ActualizarPanelLateral();
+        }
+        catch (Exception)
+        {
+            // Manejar error de carga
+            ArchivoCargado = null;
+            ContenidoArchivoCargado = null;
+        }
+    }
+
+    private void ActualizarPanelLateral()
+    {
+        if (MenuLateral == null)
+            return;
+
+        var textoArchivo = MenuLateral.FindControl<TextBlock>("LoadedFileText");
+        if (textoArchivo != null)
+        {
+            if (!string.IsNullOrEmpty(ArchivoCargado))
+            {
+                textoArchivo.Text = $"📄 {ArchivoCargado}";
+            }
+            else
+            {
+                textoArchivo.Text = "Ningún archivo cargado";
             }
         }
     }
