@@ -240,11 +240,56 @@ public partial class ArbolSintacticoView : UserControl
         
         _treeCanvas.Children.Clear();
         
-        // Dibujar el árbol desde la raíz
-        double inicioX = 400;
-        double inicioY = 30;
+        // Calcular dimensiones del árbol
+        int profundidad = CalcularProfundidad(arbol);
+        int anchoMaximo = CalcularAnchoMaximo(arbol);
         
-        DibujarNodo(arbol, inicioX, inicioY, 300, 0);
+        // Configurar espaciado
+        double margen = 50;
+        double espacioVertical = 100;
+        double espacioHorizontalBase = 180;
+        
+        // Calcular dimensiones necesarias del canvas
+        double anchoNecesario = Math.Max(800, anchoMaximo * espacioHorizontalBase + margen * 2);
+        double altoNecesario = Math.Max(600, profundidad * espacioVertical + margen * 2);
+        
+        _treeCanvas.Width = anchoNecesario;
+        _treeCanvas.Height = altoNecesario;
+        
+        // Calcular posición inicial centrada
+        double inicioX = anchoNecesario / 2;
+        double inicioY = margen;
+        
+        // Dibujar el árbol desde la raíz
+        DibujarNodo(arbol, inicioX, inicioY, espacioHorizontalBase, 0);
+    }
+    
+    private int CalcularProfundidad(NodoSintactico nodo)
+    {
+        var hijos = ObtenerHijos(nodo);
+        if (hijos.Count == 0) return 1;
+        
+        int maxProfundidad = 0;
+        foreach (var hijo in hijos)
+        {
+            maxProfundidad = Math.Max(maxProfundidad, CalcularProfundidad(hijo));
+        }
+        
+        return maxProfundidad + 1;
+    }
+    
+    private int CalcularAnchoMaximo(NodoSintactico nodo)
+    {
+        var hijos = ObtenerHijos(nodo);
+        if (hijos.Count == 0) return 1;
+        
+        int anchoTotal = 0;
+        foreach (var hijo in hijos)
+        {
+            anchoTotal += CalcularAnchoMaximo(hijo);
+        }
+        
+        return Math.Max(hijos.Count, anchoTotal);
     }
     
     private double DibujarNodo(NodoSintactico nodo, double x, double y, double espacioHorizontal, int nivel)
@@ -288,13 +333,22 @@ public partial class ArbolSintacticoView : UserControl
         var hijos = ObtenerHijos(nodo);
         if (hijos.Count > 0)
         {
-            double yHijo = y + 80;
-            double espacioTotal = espacioHorizontal * hijos.Count;
-            double xInicio = x - espacioTotal / 2 + espacioHorizontal / 2;
+            double yHijo = y + 100; // Espaciado vertical consistente
+            
+            // Calcular el espaciado horizontal para este nivel
+            double espacioActual = espacioHorizontal;
+            if (hijos.Count > 3)
+            {
+                // Reducir espacio si hay muchos hijos
+                espacioActual = espacioHorizontal * 0.8;
+            }
+            
+            double espacioTotal = espacioActual * hijos.Count;
+            double xInicio = x - espacioTotal / 2 + espacioActual / 2;
             
             for (int i = 0; i < hijos.Count; i++)
             {
-                double xHijo = xInicio + i * espacioHorizontal;
+                double xHijo = xInicio + i * espacioActual;
                 
                 // Dibujar línea al hijo
                 var line = new Line
@@ -306,8 +360,8 @@ public partial class ArbolSintacticoView : UserControl
                 };
                 _treeCanvas.Children.Add(line);
                 
-                // Dibujar el hijo recursivamente
-                DibujarNodo(hijos[i], xHijo, yHijo, espacioHorizontal / 2, nivel + 1);
+                // Dibujar el hijo recursivamente con menos espacio horizontal
+                DibujarNodo(hijos[i], xHijo, yHijo, espacioActual * 0.6, nivel + 1);
             }
             
             return yHijo;
