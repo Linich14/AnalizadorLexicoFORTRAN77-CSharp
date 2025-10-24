@@ -1,0 +1,5 @@
+PROGRAM TEST
+INTEGER X
+X = 10
+PRINT *, 'Hola'
+END

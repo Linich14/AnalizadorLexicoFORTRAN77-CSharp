@@ -44,7 +44,14 @@ namespace AnalizadorLexico.Lexico
                 var caracter = CaracterActual();
                 if (char.IsWhiteSpace(caracter))
                 {
-                    if (caracter == '\n') { EmitirFinDeLinea(); Avanzar(); continue; }
+                    if (caracter == '\n')
+                    {
+                        yield return new Token(TipoToken.EOL, "\\n", _linea, _columna);
+                        _linea++;
+                        _columna = 1;
+                        _posicion++;
+                        continue;
+                    }
                     Avanzar();
                     continue;
                 }
@@ -87,6 +94,10 @@ namespace AnalizadorLexico.Lexico
                         yield return Emitir(TipoToken.ParentesisCierre, ")"); Avanzar(); break;
                     case ',':
                         yield return Emitir(TipoToken.Coma, ","); Avanzar(); break;
+                    case '\'':
+                    case '"':
+                        yield return LeerStringLiteral();
+                        break;
                     default:
                         yield return Emitir(TipoToken.Desconocido, caracter.ToString()); Avanzar(); break;
                 }
@@ -199,9 +210,44 @@ namespace AnalizadorLexico.Lexico
         private bool SiguienteEsDigito() => (_posicion + 1 < _codigoFuente.Length) && char.IsDigit(_codigoFuente[_posicion + 1]);
 
         /// <summary>
-        ///  Emite un token de fin de línea (EOL).
+        /// Lee un string literal delimitado por comillas simples (') o dobles (").
+        /// En FORTRAN77, los strings se delimitan con comillas simples.
         /// </summary>
-        private void EmitirFinDeLinea() { /* opcional: emitir EOL visible si se requiere */ }
+        /// <returns>Token que representa el string literal.</returns>
+        private Token LeerStringLiteral()
+        {
+            var columnaInicio = _columna;
+            var comillaInicial = CaracterActual(); // ' o "
+            var constructorCadena = new StringBuilder();
+            
+            // No incluir la comilla inicial en el lexema
+            Avanzar();
+            
+            // Leer hasta encontrar la comilla de cierre
+            while (!EsFin() && CaracterActual() != comillaInicial)
+            {
+                // En FORTRAN77, las comillas dobles se escapan con dos comillas seguidas
+                if (CaracterActual() == comillaInicial && !EsFin() && _posicion + 1 < _codigoFuente.Length && _codigoFuente[_posicion + 1] == comillaInicial)
+                {
+                    constructorCadena.Append(comillaInicial);
+                    Avanzar(); // Primera comilla
+                    Avanzar(); // Segunda comilla
+                }
+                else
+                {
+                    constructorCadena.Append(CaracterActual());
+                    Avanzar();
+                }
+            }
+            
+            // Consumir la comilla final
+            if (!EsFin() && CaracterActual() == comillaInicial)
+            {
+                Avanzar();
+            }
+            
+            return new Token(TipoToken.StringLiteral, constructorCadena.ToString(), _linea, columnaInicio);
+        }
 
 
         /// <summary>

@@ -1,0 +1,14 @@
+      REAL A, B, RESULT
+      INTEGER I, J
+      A = 5.0
+      B = 2.5
+      RESULT = A * (B + 3.0) / 2.0
+      I = 10
+      J = I - 4
+      IF (RESULT .GT. 10.0) THEN
+         RESULT = RESULT - 1.0
+      ENDIF
+      DO 200 K = 1, 3
+         PRINT *, 'K =', K
+  200 CONTINUE
+      END

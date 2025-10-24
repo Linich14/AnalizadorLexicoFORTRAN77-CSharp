@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using AnalizadorLexico.UI.Views;
+using AnalizadorLexico.Sintaxis;
 using System.IO;
 using System;
 
@@ -7,10 +8,16 @@ namespace AnalizadorLexico;
 
 public partial class MainWindow : Window
 {
+    public static MainWindow? Instance { get; private set; }
+    
     public string? ArchivoCargado { get; private set; }
     public string? ContenidoArchivoCargado { get; private set; }
+    public Programa? ArbolSintacticoActual { get; private set; }
+    public long TiempoAnalisisMs { get; private set; }
+    
     public MainWindow()
     {
+        Instance = this;
         InitializeComponent();
         
         // Usar Opened en lugar de AttachedToVisualTree
@@ -75,7 +82,11 @@ public partial class MainWindow : Window
     private void MostrarVistaArbolSintactico()
     {
         if (PanelPrincipal?.AreaContenido != null)
+        {
+            // La vista se encargará de cargar el árbol automáticamente
+            // cuando se adjunte al árbol visual
             PanelPrincipal.AreaContenido.Content = new ArbolSintacticoView();
+        }
     }
 
     private void AlternarTema()
@@ -108,4 +119,11 @@ public partial class MainWindow : Window
             ContenidoArchivoCargado = null;
         }
     }
+    
+    public void ActualizarArbolSintactico(Programa arbol, long tiempoMs = 0)
+    {
+        ArbolSintacticoActual = arbol;
+        TiempoAnalisisMs = tiempoMs;
+    }
 }
+

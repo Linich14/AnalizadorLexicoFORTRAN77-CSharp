@@ -74,11 +74,20 @@ public partial class AnalizarExpresionView : UserControl
             MostrarTokens(tokens);
 
             // FASE 2: Análisis Sintáctico
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             var parser = new Parser(tokens);
             var arbolSintactico = parser.ParsePrograma();
+            stopwatch.Stop();
 
             // Mostrar árbol sintáctico
             MostrarArbolSintactico(arbolSintactico);
+
+            // Actualizar MainWindow con el árbol
+            var ventanaPrincipal = this.VisualRoot as MainWindow;
+            if (ventanaPrincipal != null)
+            {
+                ventanaPrincipal.ActualizarArbolSintactico(arbolSintactico, stopwatch.ElapsedMilliseconds);
+            }
 
             // Mensaje de éxito
             if (TxtErrors != null)

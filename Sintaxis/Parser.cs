@@ -419,7 +419,7 @@ namespace AnalizadorLexico.Sintaxis
         /// <returns>True si el token actual coincide con el tipo esperado, de lo contrario false.</returns>
         private bool Check(TipoToken tipo)
         {
-            if (EsFin()) return false;
+            if (_posicionActual >= _tokens.Count) return false;
             return Actual().Tipo == tipo;
         }
 

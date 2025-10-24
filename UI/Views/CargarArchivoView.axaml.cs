@@ -30,7 +30,6 @@ public partial class CargarArchivoView : UserControl
     private TextBlock? _txtFileInfo;
     private TextBox? _outputSourceCode;
     private TextBox? _outputTokensResult;
-    private TextBox? _outputSyntaxTreeResult;
     private TextBox? _outputMessages;
     
     private ComboBox? CmbFiles => _cmbFiles ??= this.FindControl<ComboBox>("FilesCombo");
@@ -39,7 +38,6 @@ public partial class CargarArchivoView : UserControl
     private TextBlock? TxtFileInfo => _txtFileInfo ??= this.FindControl<TextBlock>("FileInfoLabel");
     private TextBox? OutputSourceCode => _outputSourceCode ??= this.FindControl<TextBox>("SourceCodeArea");
     private TextBox? OutputTokensResult => _outputTokensResult ??= this.FindControl<TextBox>("TokensArea");
-    private TextBox? OutputSyntaxTreeResult => _outputSyntaxTreeResult ??= this.FindControl<TextBox>("TreeArea");
     private TextBox? OutputMessages => _outputMessages ??= this.FindControl<TextBox>("MessagesArea");
 
     public CargarArchivoView()
@@ -136,7 +134,8 @@ public partial class CargarArchivoView : UserControl
     private void CuandoClickAnalizar(object? sender, RoutedEventArgs e)
     {
         var archivoSeleccionado = CmbFiles?.SelectedItem as InformacionArchivo;
-        if (archivoSeleccionado == null) return;
+        if (archivoSeleccionado == null)
+            return;
 
         try
         {
@@ -163,17 +162,20 @@ public partial class CargarArchivoView : UserControl
             MostrarTokens(tokens);
 
             // FASE 2: Análisis Sintáctico
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             var parser = new Parser(tokens);
             var arbolSintactico = parser.ParsePrograma();
+            stopwatch.Stop();
 
-            // Mostrar árbol sintáctico
-            MostrarArbolSintactico(arbolSintactico);
-
-            // Actualizar MainWindow con el archivo cargado
+            // Actualizar MainWindow con el archivo y árbol cargado
             var ventanaPrincipal = this.VisualRoot as MainWindow;
+            if (ventanaPrincipal == null)
+                ventanaPrincipal = MainWindow.Instance;
+            
             if (ventanaPrincipal != null)
             {
                 ventanaPrincipal.CargarArchivo(archivoSeleccionado.RutaCompleta);
+                ventanaPrincipal.ActualizarArbolSintactico(arbolSintactico, stopwatch.ElapsedMilliseconds);
             }
 
             // Mensaje de éxito
@@ -186,8 +188,11 @@ public partial class CargarArchivoView : UserControl
                 msg.AppendLine($"Tamaño: {archivoSeleccionado.Tamanio} bytes");
                 msg.AppendLine($"Tokens generados: {tokens.Count(t => t.Tipo != TipoToken.EOF && t.Tipo != TipoToken.EOL)}");
                 msg.AppendLine($"Sentencias: {arbolSintactico.Sentencias.Count}");
+                msg.AppendLine($"Tiempo de análisis: {stopwatch.ElapsedMilliseconds} ms");
                 msg.AppendLine();
                 msg.AppendLine("El código es sintácticamente correcto según la gramática FORTRAN77 implementada.");
+                msg.AppendLine();
+                msg.AppendLine("💡 Navega a 'Árbol Sintáctico' en el menú lateral para ver la visualización completa.");
                 OutputMessages.Text = msg.ToString();
             }
 
@@ -236,122 +241,6 @@ public partial class CargarArchivoView : UserControl
         OutputTokensResult.Text = resultado.ToString();
     }
 
-    private void MostrarArbolSintactico(Programa programa)
-    {
-        if (OutputSyntaxTreeResult == null) return;
-
-        var resultado = new StringBuilder();
-        resultado.AppendLine("════════════════════════════════════════════════════════");
-        resultado.AppendLine("  ÁRBOL SINTÁCTICO ABSTRACTO (AST)");
-        resultado.AppendLine("════════════════════════════════════════════════════════");
-        resultado.AppendLine();
-        resultado.AppendLine("Programa");
-        resultado.AppendLine("│");
-
-        for (int i = 0; i < programa.Sentencias.Count; i++)
-        {
-            var esUltimo = i == programa.Sentencias.Count - 1;
-            var prefijo = esUltimo ? "└── " : "├── ";
-            var prefijoHijo = esUltimo ? "    " : "│   ";
-
-            ImprimirNodo(resultado, programa.Sentencias[i], prefijo, prefijoHijo);
-        }
-
-        OutputSyntaxTreeResult.Text = resultado.ToString();
-    }
-
-    private void ImprimirNodo(StringBuilder sb, NodoSintactico nodo, string prefijo, string prefijoHijo)
-    {
-        switch (nodo)
-        {
-            case Asignacion asig:
-                sb.AppendLine($"{prefijo}Asignación: {asig.Identificador}");
-                ImprimirNodo(sb, asig.Valor, prefijoHijo + "└── ", prefijoHijo + "    ");
-                break;
-
-            case Binaria bin:
-                sb.AppendLine($"{prefijo}Operación: {bin.Operador}");
-                ImprimirNodo(sb, bin.Izquierda, prefijoHijo + "├── ", prefijoHijo + "│   ");
-                ImprimirNodo(sb, bin.Derecha, prefijoHijo + "└── ", prefijoHijo + "    ");
-                break;
-
-            case Numero num:
-                sb.AppendLine($"{prefijo}Número: {num.Lexema}");
-                break;
-
-            case Variable var:
-                sb.AppendLine($"{prefijo}Variable: {var.Nombre}");
-                break;
-
-            case If ifNode:
-                sb.AppendLine($"{prefijo}IF");
-                sb.AppendLine($"{prefijoHijo}├── Condición:");
-                ImprimirNodo(sb, ifNode.Condicion, prefijoHijo + "│   └── ", prefijoHijo + "│       ");
-                sb.AppendLine($"{prefijoHijo}├── THEN ({ifNode.SentenciasThen.Count} sentencias)");
-                for (int i = 0; i < ifNode.SentenciasThen.Count; i++)
-                {
-                    var esUltimo = i == ifNode.SentenciasThen.Count - 1;
-                    var pre = esUltimo ? "│   └── " : "│   ├── ";
-                    var preHijo = esUltimo ? "│       " : "│   │   ";
-                    ImprimirNodo(sb, ifNode.SentenciasThen[i], prefijoHijo + pre, prefijoHijo + preHijo);
-                }
-                if (ifNode.SentenciasElse.Count > 0)
-                {
-                    sb.AppendLine($"{prefijoHijo}└── ELSE ({ifNode.SentenciasElse.Count} sentencias)");
-                    for (int i = 0; i < ifNode.SentenciasElse.Count; i++)
-                    {
-                        var esUltimo = i == ifNode.SentenciasElse.Count - 1;
-                        var pre = esUltimo ? "    └── " : "    ├── ";
-                        var preHijo = esUltimo ? "        " : "    │   ";
-                        ImprimirNodo(sb, ifNode.SentenciasElse[i], prefijoHijo + pre, prefijoHijo + preHijo);
-                    }
-                }
-                break;
-
-            case DoLoop doLoop:
-                sb.AppendLine($"{prefijo}DO Loop (etiqueta: {doLoop.Label})");
-                sb.AppendLine($"{prefijoHijo}├── Variable: {doLoop.Identificador}");
-                sb.AppendLine($"{prefijoHijo}├── Inicio:");
-                ImprimirNodo(sb, doLoop.Inicio, prefijoHijo + "│   └── ", prefijoHijo + "│       ");
-                sb.AppendLine($"{prefijoHijo}├── Fin:");
-                ImprimirNodo(sb, doLoop.Fin, prefijoHijo + "│   └── ", prefijoHijo + "│       ");
-                if (doLoop.Incremento != null)
-                {
-                    sb.AppendLine($"{prefijoHijo}├── Incremento:");
-                    ImprimirNodo(sb, doLoop.Incremento, prefijoHijo + "│   └── ", prefijoHijo + "│       ");
-                }
-                sb.AppendLine($"{prefijoHijo}└── Cuerpo ({doLoop.Sentencias.Count} sentencias)");
-                for (int i = 0; i < doLoop.Sentencias.Count; i++)
-                {
-                    var esUltimo = i == doLoop.Sentencias.Count - 1;
-                    var pre = esUltimo ? "    └── " : "    ├── ";
-                    var preHijo = esUltimo ? "        " : "    │   ";
-                    ImprimirNodo(sb, doLoop.Sentencias[i], prefijoHijo + pre, prefijoHijo + preHijo);
-                }
-                break;
-
-            case Declaracion decl:
-                sb.AppendLine($"{prefijo}Declaración: {decl.TipoDato} {string.Join(", ", decl.Identificadores)}");
-                break;
-
-            case DirectivaProgram prog:
-                sb.AppendLine($"{prefijo}PROGRAM: {prog.NombrePrograma}");
-                break;
-
-            case SentenciaPrint print:
-                sb.AppendLine($"{prefijo}PRINT: {string.Join(" ", print.Argumentos)}");
-                break;
-
-            case DirectivaSimple dir:
-                sb.AppendLine($"{prefijo}{dir.Tipo}");
-                break;
-
-            default:
-                sb.AppendLine($"{prefijo}{nodo.Tipo}");
-                break;
-        }
-    }
-
     private void MostrarError(string mensaje)
     {
         if (OutputMessages != null)
@@ -363,7 +252,7 @@ public partial class CargarArchivoView : UserControl
         var tabControl = this.FindControl<TabControl>("TabResults");
         if (tabControl != null)
         {
-            tabControl.SelectedIndex = 3; // Pestaña de mensajes/errores
+            tabControl.SelectedIndex = 2; // Pestaña de mensajes (ahora es la tercera)
         }
     }
 
@@ -371,7 +260,6 @@ public partial class CargarArchivoView : UserControl
     {
         if (OutputSourceCode != null) OutputSourceCode.Text = string.Empty;
         if (OutputTokensResult != null) OutputTokensResult.Text = string.Empty;
-        if (OutputSyntaxTreeResult != null) OutputSyntaxTreeResult.Text = string.Empty;
         if (OutputMessages != null) OutputMessages.Text = "Selecciona un archivo y presiona 'Analizar Archivo' para ver los resultados.";
     }
 }

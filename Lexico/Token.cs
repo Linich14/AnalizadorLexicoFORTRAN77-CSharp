@@ -5,6 +5,7 @@ public enum TipoToken
     Identificador,
     NumeroEntero,
     NumeroReal,
+    StringLiteral,        // 'texto' o "texto"
     OperadorAritmetico,   // + - * /
     OperadorRelacional,   // .GT. .LT. .EQ. .NE. .GE. .LE.
     Asignacion,           // =
