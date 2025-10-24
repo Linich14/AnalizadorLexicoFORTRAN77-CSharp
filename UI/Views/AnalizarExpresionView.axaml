@@ -15,7 +15,7 @@
                   HorizontalAlignment="Center"/>
 
         <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
-            <TextBox Name="ExpressionInput"
+            <TextBox x:Name="InputExpression"
                     Height="80"
                     TextWrapping="Wrap"
                     FontFamily="Consolas"
@@ -25,7 +25,7 @@
                     AcceptsReturn="True"/>
         </Border>
 
-        <Button Name="AnalyzeExpressionButton"
+        <Button x:Name="BtnAnalyzeExpression"
                 Content="Analizar Expresion"
                 HorizontalAlignment="Center"
                 Padding="20,10"
@@ -55,7 +55,7 @@
             <TabItem Header="Tokens">
                 <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
                     <ScrollViewer>
-                        <TextBox Name="TokensResultTextBox"
+                        <TextBox x:Name="OutputTokens"
                                 IsReadOnly="True"
                                 TextWrapping="Wrap"
                                 FontFamily="Consolas"
@@ -70,7 +70,7 @@
             <TabItem Header="Árbol Sintáctico">
                 <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
                     <ScrollViewer>
-                        <TextBox Name="SyntaxTreeResultTextBox"
+                        <TextBox x:Name="OutputSyntaxTree"
                                 IsReadOnly="True"
                                 TextWrapping="Wrap"
                                 FontFamily="Consolas"
@@ -85,7 +85,7 @@
             <TabItem Header="Errores">
                 <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
                     <ScrollViewer>
-                        <TextBox Name="ErrorsResultTextBox"
+                        <TextBox x:Name="OutputErrors"
                                 IsReadOnly="True"
                                 TextWrapping="Wrap"
                                 FontFamily="Consolas"

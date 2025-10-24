@@ -1,18 +1,18 @@
-     PROGRAM CALCULO
-      INTEGER X, Y, Z
-      REAL A, B, C
-      X = 10
-      Y = 20
-      Z = X + Y * (3 - 1)
-      A = 3.14
-      B = A / 2.0
-      C = B + 1.0
-      IF (Z .GT. 25) THEN
-         PRINT *, 'Z es mayor que 25'
-      ELSE
-         PRINT *, 'Z es menor o igual que 25'
-      ENDIF
-      DO 100 I = 1, 5
-         PRINT *, 'Iteracion', I
-  100 CONTINUE
-      END
+PROGRAM CALCULO
+INTEGER X, Y, Z
+REAL A, B, C
+X = 10
+Y = 20
+Z = X + Y * (3 - 1)
+A = 3.14
+B = A / 2.0
+C = B + 1.0
+IF (Z .GT. 25) THEN
+   PRINT *, 'Z es mayor que 25'
+ELSE
+   PRINT *, 'Z es menor o igual que 25'
+ENDIF
+DO 100 I = 1, 5
+   PRINT *, 'Iteracion', I
+100 CONTINUE
+END

@@ -123,16 +123,62 @@ namespace AnalizadorLexico.Sintaxis
         {
             public override string Tipo => "Declaracion";
             public string TipoDato { get; }
-            public string Identificador { get; }
+            public List<string> Identificadores { get; }
 
+            public Declaracion(string tipoDato, List<string> identificadores)
+            {
+                TipoDato = tipoDato;
+                Identificadores = identificadores;
+            }
+            
+            // Constructor legacy para compatibilidad
             public Declaracion(string tipoDato, string identificador)
             {
                 TipoDato = tipoDato;
-                Identificador = identificador;
+                Identificadores = new List<string> { identificador };
             }
         }
 
+    /// <summary>
+    /// Nodo que representa la directiva PROGRAM con nombre del programa
+    /// </summary>
+    public class DirectivaProgram : NodoSintactico
+    {
+        public override string Tipo => "PROGRAM";
+        public string NombrePrograma { get; }
 
+        public DirectivaProgram(string nombrePrograma)
+        {
+            NombrePrograma = nombrePrograma;
+        }
+    }
+
+    /// <summary>
+    /// Nodo que representa una sentencia PRINT
+    /// </summary>
+    public class SentenciaPrint : NodoSintactico
+    {
+        public override string Tipo => "PRINT";
+        public List<string> Argumentos { get; }
+
+        public SentenciaPrint(List<string> argumentos)
+        {
+            Argumentos = argumentos;
+        }
+    }
+
+    /// <summary>
+    /// Nodo que representa directivas simples (END, CONTINUE, STOP, etc.)
+    /// </summary>
+    public class DirectivaSimple : NodoSintactico
+    {
+        public override string Tipo { get; }
+        
+        public DirectivaSimple(string tipo)
+        {
+            Tipo = tipo;
+        }
+    }
 
 
     /// <summary>

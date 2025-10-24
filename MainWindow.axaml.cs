@@ -100,34 +100,12 @@ public partial class MainWindow : Window
         {
             ArchivoCargado = Path.GetFileName(rutaArchivo);
             ContenidoArchivoCargado = File.ReadAllText(rutaArchivo);
-
-            // Actualizar el panel lateral con información del archivo
-            ActualizarPanelLateral();
         }
         catch (Exception)
         {
             // Manejar error de carga
             ArchivoCargado = null;
             ContenidoArchivoCargado = null;
-        }
-    }
-
-    private void ActualizarPanelLateral()
-    {
-        if (MenuLateral == null)
-            return;
-
-        var textoArchivo = MenuLateral.FindControl<TextBlock>("LoadedFileText");
-        if (textoArchivo != null)
-        {
-            if (!string.IsNullOrEmpty(ArchivoCargado))
-            {
-                textoArchivo.Text = $"📄 {ArchivoCargado}";
-            }
-            else
-            {
-                textoArchivo.Text = "Ningún archivo cargado";
-            }
         }
     }
 }

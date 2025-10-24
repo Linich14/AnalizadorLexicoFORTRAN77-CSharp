@@ -2,113 +2,143 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:AnalizadorLexico.UI.Views"
              x:Class="AnalizadorLexico.UI.Views.CargarArchivoView">
-    <StackPanel Margin="30" Spacing="20">
-        <TextBlock Text="Cargar Archivo FORTRAN77"
+    <Grid Margin="30" RowDefinitions="Auto,Auto,Auto,*">
+        
+        <!-- Título -->
+        <TextBlock Text="Análisis de Archivo FORTRAN77"
                   FontSize="24"
                   FontWeight="Bold"
                   Foreground="White"
-                  HorizontalAlignment="Center"/>
+                  HorizontalAlignment="Center"
+                  Grid.Row="0"
+                  Margin="0,0,0,20"/>
 
-        <TextBlock Text="Selecciona un archivo .txt o .f77 para analizar:"
-                  FontSize="14"
-                  Foreground="#CBD5E0"
-                  TextWrapping="Wrap"
-                  HorizontalAlignment="Center"/>
-
-        <!-- Panel de archivos disponibles -->
-        <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
-            <StackPanel Margin="10">
-                <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,10">
-                    <TextBlock Text="Archivos disponibles en carpeta 'input':"
-                              FontSize="14"
-                              FontWeight="SemiBold"
-                              Foreground="White"
-                              VerticalAlignment="Center"/>
-                    <Button x:Name="BtnRefresh"
-                            Content="🔄 Refrescar"
-                            Grid.Column="1"
-                            Padding="10,5"
-                            Background="#E53E3E"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="3"
-                            FontSize="12">
+        <!-- Selector de archivo -->
+        <Border BorderBrush="#4A5568" 
+                BorderThickness="1" 
+                CornerRadius="5" 
+                Padding="15"
+                Background="#2D3748"
+                Grid.Row="1"
+                Margin="0,0,0,15">
+            <Grid RowDefinitions="Auto,10,Auto,15,Auto">
+                <TextBlock Text="1. Selecciona un archivo para analizar:"
+                          FontSize="14"
+                          Foreground="#CBD5E0"
+                          Grid.Row="0"/>
+                
+                <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto">
+                    <ComboBox x:Name="FilesCombo"
+                             Grid.Column="0"
+                             FontFamily="Consolas"
+                             FontSize="12"
+                             Background="#1A202C"
+                             Foreground="White"
+                             MinWidth="300">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="local:InformacionArchivo">
+                                <TextBlock Text="{Binding Nombre}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    
+                    <Button x:Name="RefreshBtn"
+                           Content="🔄"
+                           Grid.Column="1"
+                           Margin="10,0,0,0"
+                           Padding="10,5"
+                           Background="#4A5568"
+                           Foreground="White"
+                           ToolTip.Tip="Refrescar lista de archivos"/>
+                    
+                    <Button x:Name="AnalyzeBtn"
+                           Content="🔍 Analizar Archivo"
+                           Grid.Column="2"
+                           Margin="10,0,0,0"
+                           Padding="15,8"
+                           Background="#3182CE"
+                           Foreground="White"
+                           IsEnabled="False">
                         <Button.Styles>
                             <Style Selector="Button:pointerover">
-                                <Setter Property="Background" Value="#C53030"/>
-                            </Style>
-                            <Style Selector="Button:pressed">
-                                <Setter Property="Background" Value="#9B2C2C"/>
+                                <Setter Property="Background" Value="#2C5282"/>
                             </Style>
                         </Button.Styles>
                     </Button>
                 </Grid>
-
-                <ListBox x:Name="LstFiles"
-                        Height="150"
-                        Background="Transparent"
-                        BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="local:InformacionArchivo">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <TextBlock Text="{Binding Nombre}"
-                                          FontFamily="Consolas"
-                                          FontSize="12"/>
-                                <TextBlock Text="{Binding Tamanio, StringFormat='({0} bytes)'}"
-                                          FontSize="10"
-                                          Foreground="#718096"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
+                
+                <TextBlock x:Name="FileInfoLabel"
+                          Text="Selecciona un archivo de la carpeta 'input/'"
+                          Grid.Row="4"
+                          FontSize="11"
+                          Foreground="#718096"/>
+            </Grid>
         </Border>
 
-        <TextBlock x:Name="TxtSelectedFile"
-                  Text="Ningún archivo seleccionado"
-                  FontSize="12"
-                  Foreground="#718096"
-                  HorizontalAlignment="Center"
-                  TextWrapping="Wrap"/>
+        <!-- Separador -->
+        <Separator Background="#4A5568" Grid.Row="2" Margin="0,0,0,15"/>
 
-        <Separator Background="#E2E8F0"/>
-
-        <TextBlock Text="Contenido del Archivo:"
-                  FontSize="16"
-                  FontWeight="SemiBold"
-                  Foreground="White"/>
-
-        <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="5">
-            <ScrollViewer Height="300">
-                <TextBox x:Name="TxtFileContent"
-                        IsReadOnly="True"
-                        TextWrapping="Wrap"
-                        FontFamily="Consolas"
-                        FontSize="12"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="10"/>
-            </ScrollViewer>
-        </Border>
-
-        <Button x:Name="BtnLoadFile"
-                Content="📁 Cargar Archivo"
-                HorizontalAlignment="Center"
-                Padding="15,8"
-                Background="#38A169"
-                Foreground="White"
-                BorderThickness="0"
-                CornerRadius="5"
-                FontSize="14"
-                IsEnabled="False">
-            <Button.Styles>
-                <Style Selector="Button:pointerover">
-                    <Setter Property="Background" Value="#2F855A"/>
-                </Style>
-                <Style Selector="Button:pressed">
-                    <Setter Property="Background" Value="#22543D"/>
-                </Style>
-            </Button.Styles>
-        </Button>
-    </StackPanel>
+        <!-- Resultados con pestañas -->
+        <TabControl x:Name="TabResults" Grid.Row="3" Background="Transparent">
+            <TabItem Header="Código Fuente">
+                <Border BorderBrush="#4A5568" BorderThickness="1" CornerRadius="5" Padding="10">
+                    <ScrollViewer>
+                        <TextBox x:Name="SourceCodeArea"
+                                IsReadOnly="True"
+                                TextWrapping="Wrap"
+                                FontFamily="Consolas"
+                                FontSize="12"
+                                Background="Transparent"
+                                Foreground="#E2E8F0"
+                                BorderThickness="0"/>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+            
+            <TabItem Header="Tokens">
+                <Border BorderBrush="#4A5568" BorderThickness="1" CornerRadius="5" Padding="10">
+                    <ScrollViewer>
+                        <TextBox x:Name="TokensArea"
+                                IsReadOnly="True"
+                                TextWrapping="Wrap"
+                                FontFamily="Consolas"
+                                FontSize="11"
+                                Background="Transparent"
+                                Foreground="#E2E8F0"
+                                BorderThickness="0"/>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+            
+            <TabItem Header="Árbol Sintáctico">
+                <Border BorderBrush="#4A5568" BorderThickness="1" CornerRadius="5" Padding="10">
+                    <ScrollViewer>
+                        <TextBox x:Name="TreeArea"
+                                IsReadOnly="True"
+                                TextWrapping="Wrap"
+                                FontFamily="Consolas"
+                                FontSize="11"
+                                Background="Transparent"
+                                Foreground="#E2E8F0"
+                                BorderThickness="0"/>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+            
+            <TabItem Header="Mensajes">
+                <Border BorderBrush="#4A5568" BorderThickness="1" CornerRadius="5" Padding="10">
+                    <ScrollViewer>
+                        <TextBox x:Name="MessagesArea"
+                                IsReadOnly="True"
+                                TextWrapping="Wrap"
+                                FontFamily="Consolas"
+                                FontSize="12"
+                                Background="Transparent"
+                                Foreground="#E2E8F0"
+                                BorderThickness="0"/>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

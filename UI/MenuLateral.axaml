@@ -137,23 +137,6 @@
                 </Button>
 
             </StackPanel>
-
-            <!-- Información del archivo cargado -->
-            <Border BorderBrush="#4A5568" BorderThickness="0,1,0,0" Margin="10,20,10,10" Padding="0,10,0,0">
-                <StackPanel>
-                    <TextBlock Text="Archivo Cargado:"
-                              FontSize="12"
-                              FontWeight="SemiBold"
-                              Foreground="#CBD5E0"
-                              Margin="0,0,0,5"/>
-                    <TextBlock x:Name="LoadedFileText"
-                              Text="Ningún archivo cargado"
-                              FontSize="11"
-                              Foreground="#A0AEC0"
-                              TextWrapping="Wrap"
-                              Margin="0,0,0,5"/>
-                </StackPanel>
-            </Border>
         </StackPanel>
     </Border>
 </UserControl>
