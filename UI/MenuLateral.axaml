@@ -92,28 +92,6 @@
                           Foreground="#A0AEC0"
                           Margin="15,10,0,10"/>
 
-                <!-- Tema Claro/Oscuro -->
-                <Button x:Name="ThemeToggleButton"
-                        Content="Tema Oscuro"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        Margin="0,5"
-                        Padding="15,10"
-                        Background="#4A5568"
-                        Foreground="White"
-                        BorderThickness="0"
-                        CornerRadius="5"
-                        FontSize="14">
-                    <Button.Styles>
-                        <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#5A6578"/>
-                        </Style>
-                        <Style Selector="Button:pressed">
-                            <Setter Property="Background" Value="#2D3748"/>
-                        </Style>
-                    </Button.Styles>
-                </Button>
-
                 <!-- Cerrar Aplicación -->
                 <Button x:Name="ExitButton"
                         Content="Cerrar"

@@ -45,9 +45,6 @@ public partial class MainWindow : Window
         MenuLateral.OnViewTreeClicked += () => {
             MostrarVistaArbolSintactico();
         };
-        MenuLateral.OnThemeToggleClicked += () => {
-            AlternarTema();
-        };
         MenuLateral.OnExitClicked += () => Close();
     }
 
@@ -86,22 +83,6 @@ public partial class MainWindow : Window
             // La vista se encargará de cargar el árbol automáticamente
             // cuando se adjunte al árbol visual
             PanelPrincipal.AreaContenido.Content = new ArbolSintacticoView();
-        }
-    }
-
-    private void AlternarTema()
-    {
-        var botonTema = MenuLateral?.FindControl<Button>("ThemeToggleButton");
-        if (botonTema != null && botonTema.Content != null)
-        {
-            if (botonTema.Content.ToString()?.Contains("Oscuro") == true)
-            {
-                botonTema.Content = "Tema Claro";
-            }
-            else
-            {
-                botonTema.Content = "Tema Oscuro";
-            }
         }
     }
 

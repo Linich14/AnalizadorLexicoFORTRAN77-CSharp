@@ -5,7 +5,7 @@
         <TextBlock Text="Analizar Expresion FORTRAN77"
                   FontSize="24"
                   FontWeight="Bold"
-                  Foreground="#2D3748"
+                  Foreground="#FFFFFFFF"
                   HorizontalAlignment="Center"/>
 
         <TextBlock Text="Ingresa una expresión, asignación o estructura de control FORTRAN77:"

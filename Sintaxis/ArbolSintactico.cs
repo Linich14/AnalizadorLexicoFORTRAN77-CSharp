@@ -180,6 +180,32 @@ namespace AnalizadorLexico.Sintaxis
         }
     }
 
+    /// <summary>
+    /// Nodo contenedor virtual para agrupar declaraciones en la visualización
+    /// </summary>
+    public class GrupoDeclaraciones : NodoSintactico
+    {
+        public override string Tipo => "Declarations";
+        public List<NodoSintactico> Declaraciones { get; } = new();
+    }
+
+    /// <summary>
+    /// Nodo contenedor virtual para agrupar asignaciones en la visualización
+    /// </summary>
+    public class GrupoAsignaciones : NodoSintactico
+    {
+        public override string Tipo => "Statements";
+        public List<NodoSintactico> Asignaciones { get; } = new();
+    }
+
+    /// <summary>
+    /// Nodo contenedor virtual para agrupar estructuras de control en la visualización
+    /// </summary>
+    public class GrupoEstructurasControl : NodoSintactico
+    {
+        public override string Tipo => "Control Structures";
+        public List<NodoSintactico> Estructuras { get; } = new();
+    }
 
     /// <summary>
     /// Representa el árbol sintáctico completo.

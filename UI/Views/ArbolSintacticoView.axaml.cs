@@ -6,6 +6,7 @@ using Avalonia.Media;
 using AnalizadorLexico.Sintaxis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace AnalizadorLexico.UI.Views;
@@ -24,6 +25,7 @@ public partial class ArbolSintacticoView : UserControl
     private Button? _fitToScreenButton;
     
     private Programa? _arbolActual;
+    
     private double _escalaActual = 1.0;
     private const double EscalaIncremento = 0.1;
     
@@ -242,26 +244,42 @@ public partial class ArbolSintacticoView : UserControl
         
         // Calcular dimensiones del árbol
         int profundidad = CalcularProfundidad(arbol);
-        int anchoMaximo = CalcularAnchoMaximo(arbol);
+        
+        // Calcular el ancho real necesario basado en el número total de hojas
+        int totalHojas = ContarHojasEnSubarbol(arbol);
+        double espacioMinimoPorHoja = 140; // 120px nodo + 20px margen
+        double anchoEstimado = totalHojas * espacioMinimoPorHoja;
         
         // Configurar espaciado
-        double margen = 50;
-        double espacioVertical = 100;
-        double espacioHorizontalBase = 180;
+        double margen = 100;
+        double espacioVertical = 120;
         
-        // Calcular dimensiones necesarias del canvas
-        double anchoNecesario = Math.Max(800, anchoMaximo * espacioHorizontalBase + margen * 2);
+        // Dimensiones del canvas basadas en el contenido real
+        double anchoNecesario = Math.Max(1400, anchoEstimado + margen * 2);
         double altoNecesario = Math.Max(600, profundidad * espacioVertical + margen * 2);
+        
+        // Limitar tamaño máximo pero con límites más generosos
+        anchoNecesario = Math.Min(anchoNecesario, 8000);
+        altoNecesario = Math.Min(altoNecesario, 3000);
         
         _treeCanvas.Width = anchoNecesario;
         _treeCanvas.Height = altoNecesario;
         
-        // Calcular posición inicial centrada
+        // Posición inicial: centrar el árbol
         double inicioX = anchoNecesario / 2;
         double inicioY = margen;
         
         // Dibujar el árbol desde la raíz
-        DibujarNodo(arbol, inicioX, inicioY, espacioHorizontalBase, 0);
+        DibujarNodo(arbol, inicioX, inicioY, anchoEstimado, 0);
+        
+        // Resetear transformación para que el ScrollViewer comience desde arriba-izquierda
+        _treeCanvas.RenderTransform = null;
+        _escalaActual = 1.0;
+        
+        // Forzar actualización visual
+        _treeCanvas.InvalidateVisual();
+        _treeCanvas.InvalidateMeasure();
+        _treeCanvas.InvalidateArrange();
     }
     
     private int CalcularProfundidad(NodoSintactico nodo)
@@ -333,22 +351,31 @@ public partial class ArbolSintacticoView : UserControl
         var hijos = ObtenerHijos(nodo);
         if (hijos.Count > 0)
         {
-            double yHijo = y + 100; // Espaciado vertical consistente
+            // Espacio vertical entre niveles - constante para mantener jerarquía clara
+            double espacioVerticalEntreNiveles = 120;
+            double yHijo = y + espacioVerticalEntreNiveles;
             
-            // Calcular el espaciado horizontal para este nivel
-            double espacioActual = espacioHorizontal;
-            if (hijos.Count > 3)
+            // Calcular el ancho real que necesita cada hijo considerando sus subárboles
+            var anchosHijos = new List<double>();
+            double espacioMinimoPorNodo = 140; // Espacio mínimo para cada nodo (120px ancho + 20px margen)
+            
+            foreach (var hijo in hijos)
             {
-                // Reducir espacio si hay muchos hijos
-                espacioActual = espacioHorizontal * 0.8;
+                int numHojasSubarbol = ContarHojasEnSubarbol(hijo);
+                double anchoNecesario = Math.Max(numHojasSubarbol * espacioMinimoPorNodo, espacioMinimoPorNodo);
+                anchosHijos.Add(anchoNecesario);
             }
             
-            double espacioTotal = espacioActual * hijos.Count;
-            double xInicio = x - espacioTotal / 2 + espacioActual / 2;
+            // Calcular el ancho total necesario
+            double anchoTotalNecesario = anchosHijos.Sum();
+            
+            // Calcular posiciones de los hijos
+            double xActual = x - anchoTotalNecesario / 2;
             
             for (int i = 0; i < hijos.Count; i++)
             {
-                double xHijo = xInicio + i * espacioActual;
+                // Centrar el hijo en su espacio asignado
+                double xHijo = xActual + anchosHijos[i] / 2;
                 
                 // Dibujar línea al hijo
                 var line = new Line
@@ -360,14 +387,34 @@ public partial class ArbolSintacticoView : UserControl
                 };
                 _treeCanvas.Children.Add(line);
                 
-                // Dibujar el hijo recursivamente con menos espacio horizontal
-                DibujarNodo(hijos[i], xHijo, yHijo, espacioActual * 0.6, nivel + 1);
+                // Dibujar el hijo recursivamente con su espacio asignado
+                DibujarNodo(hijos[i], xHijo, yHijo, anchosHijos[i] / Math.Max(ObtenerHijos(hijos[i]).Count, 1), nivel + 1);
+                
+                // Avanzar a la siguiente posición
+                xActual += anchosHijos[i];
             }
             
             return yHijo;
         }
         
         return y;
+    }
+    
+    private int ContarHojasEnSubarbol(NodoSintactico nodo)
+    {
+        var hijos = ObtenerHijos(nodo);
+        
+        if (hijos.Count == 0)
+            return 1; // Es una hoja
+        
+        // Sumar las hojas de todos los hijos
+        int totalHojas = 0;
+        foreach (var hijo in hijos)
+        {
+            totalHojas += ContarHojasEnSubarbol(hijo);
+        }
+        
+        return totalHojas;
     }
     
     private string ObtenerTextoNodo(NodoSintactico nodo)
@@ -385,6 +432,9 @@ public partial class ArbolSintacticoView : UserControl
             DirectivaProgram prog => $"PROGRAM\n{prog.NombrePrograma}",
             SentenciaPrint => "PRINT",
             DirectivaSimple dir => dir.Tipo,
+            GrupoDeclaraciones => "Declarations",
+            GrupoAsignaciones => "Statements",
+            GrupoEstructurasControl => "Control\nStructures",
             _ => nodo.Tipo
         };
     }
@@ -399,6 +449,9 @@ public partial class ArbolSintacticoView : UserControl
             If or DoLoop => Color.Parse("#E53E3E"),      // Rojo
             Declaracion => Color.Parse("#805AD5"),       // Púrpura
             DirectivaProgram => Color.Parse("#2C5282"),  // Azul oscuro
+            GrupoDeclaraciones => Color.Parse("#48BB78"), // Verde claro
+            GrupoAsignaciones => Color.Parse("#F6AD55"),  // Naranja claro
+            GrupoEstructurasControl => Color.Parse("#FC8181"), // Rojo claro
             SentenciaPrint => Color.Parse("#DD6B20"),    // Naranja
             DirectivaSimple => Color.Parse("#718096"),   // Gris
             _ => Color.Parse("#4A5568")                  // Gris oscuro
@@ -412,7 +465,73 @@ public partial class ArbolSintacticoView : UserControl
         switch (nodo)
         {
             case Programa prog:
-                hijos.AddRange(prog.Sentencias);
+                // Si existe DirectivaProgram, mostrarla primero y hacer que las demás sentencias sean sus hijas
+                var directivaProgram = prog.Sentencias.FirstOrDefault(s => s is DirectivaProgram);
+                
+                if (directivaProgram != null)
+                {
+                    // Solo mostrar la directiva PROGRAM como hijo directo
+                    // Las demás sentencias serán hijas de DirectivaProgram
+                    hijos.Add(directivaProgram);
+                }
+                else
+                {
+                    // Si no hay directiva PROGRAM, mostrar todas las sentencias
+                    hijos.AddRange(prog.Sentencias);
+                }
+                break;
+            case DirectivaProgram:
+                // DirectivaProgram tiene como hijos los GRUPOS de sentencias
+                if (_arbolActual != null)
+                {
+                    // Crear grupo de Declaraciones
+                    var declaraciones = _arbolActual.Sentencias.Where(s => s is Declaracion).ToList();
+                    if (declaraciones.Count > 0)
+                    {
+                        var grupoDeclaraciones = new GrupoDeclaraciones();
+                        grupoDeclaraciones.Declaraciones.AddRange(declaraciones);
+                        hijos.Add(grupoDeclaraciones);
+                    }
+                    
+                    // Crear grupo de Asignaciones (Statements)
+                    var asignaciones = _arbolActual.Sentencias.Where(s => s is Asignacion).ToList();
+                    if (asignaciones.Count > 0)
+                    {
+                        var grupoAsignaciones = new GrupoAsignaciones();
+                        grupoAsignaciones.Asignaciones.AddRange(asignaciones);
+                        hijos.Add(grupoAsignaciones);
+                    }
+                    
+                    // Crear grupo de Estructuras de Control
+                    var estructurasControl = _arbolActual.Sentencias
+                        .Where(s => s is If || s is DoLoop)
+                        .ToList();
+                    if (estructurasControl.Count > 0)
+                    {
+                        var grupoEstructuras = new GrupoEstructurasControl();
+                        grupoEstructuras.Estructuras.AddRange(estructurasControl);
+                        hijos.Add(grupoEstructuras);
+                    }
+                    
+                    // Agregar otras sentencias que no encajan en los grupos
+                    var otrasSentencias = _arbolActual.Sentencias
+                        .Where(s => s is not DirectivaProgram && s is not Declaracion && 
+                                   s is not Asignacion && s is not If && s is not DoLoop)
+                        .ToList();
+                    hijos.AddRange(otrasSentencias);
+                }
+                break;
+            case GrupoDeclaraciones grupoDecl:
+                // Los hijos son las declaraciones individuales
+                hijos.AddRange(grupoDecl.Declaraciones);
+                break;
+            case GrupoAsignaciones grupoAsig:
+                // Los hijos son las asignaciones individuales
+                hijos.AddRange(grupoAsig.Asignaciones);
+                break;
+            case GrupoEstructurasControl grupoCtrl:
+                // Los hijos son las estructuras de control (IF, DO)
+                hijos.AddRange(grupoCtrl.Estructuras);
                 break;
             case Asignacion asig:
                 hijos.Add(asig.Valor);
@@ -503,27 +622,29 @@ public partial class ArbolSintacticoView : UserControl
     private void AplicarZoom(double factor)
     {
         _escalaActual *= factor;
-        _escalaActual = Math.Max(0.5, Math.Min(2.0, _escalaActual));
+        _escalaActual = Math.Max(0.3, Math.Min(2.0, _escalaActual));
+        AplicarEscala();
+    }
+    
+    private void AplicarEscala()
+    {
+        if (_treeCanvas == null) return;
         
-        if (_treeCanvas != null && _arbolActual != null)
-        {
-            _treeCanvas.Width = 800 * _escalaActual;
-            _treeCanvas.Height = 600 * _escalaActual;
-            ActualizarVistaGrafica(_arbolActual);
-        }
+        // Aplicar transformación de escala al canvas
+        var scaleTransform = new ScaleTransform(_escalaActual, _escalaActual);
+        _treeCanvas.RenderTransform = scaleTransform;
+        
+        // Actualizar origen de transformación al centro
+        _treeCanvas.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
     }
     
     private void AjustarAPantalla()
     {
+        if (_arbolActual == null || _treeCanvas == null) return;
+        
+        // Restaurar escala y redibujar
         _escalaActual = 1.0;
-        if (_treeCanvas != null)
-        {
-            _treeCanvas.Width = 800;
-            _treeCanvas.Height = 600;
-        }
-        if (_arbolActual != null)
-        {
-            ActualizarVistaGrafica(_arbolActual);
-        }
+        _treeCanvas.RenderTransform = null;
+        ActualizarVistaGrafica(_arbolActual);
     }
 }

@@ -10,7 +10,6 @@ public partial class MenuLateral : UserControl
     public event System.Action? OnLoadFileClicked;
     public event System.Action? OnAnalyzeExpressionClicked;
     public event System.Action? OnViewTreeClicked;
-    public event System.Action? OnThemeToggleClicked;
     public event System.Action? OnExitClicked;
 
     public MenuLateral()
@@ -51,12 +50,6 @@ public partial class MenuLateral : UserControl
             if (viewTreeButton != null)
             {
                 viewTreeButton.Click += (sender, args) => OnViewTreeClicked?.Invoke();
-            }
-
-            var themeToggleButton = this.FindControl<Button>("ThemeToggleButton");
-            if (themeToggleButton != null)
-            {
-                themeToggleButton.Click += (sender, args) => OnThemeToggleClicked?.Invoke();
             }
 
             var exitButton = this.FindControl<Button>("ExitButton");

@@ -1,0 +1,122 @@
+      PROGRAM TESTEXPR
+      INTEGER X, Y, Z, A, B
+      REAL C, D
+
+C     ============================================
+C     CASOS DE PRUEBA DEL PROFESOR (adaptados)
+C     ============================================
+
+C     Test simple expression from professor: x := 3 + 5 * 2
+C     Adapted to FORTRAN77: X = 3 + 5 * 2
+      X = 3 + 5 * 2
+
+C     Test with parentheses: (3 + 5) * 2
+      Y = (3 + 5) * 2
+
+C     Test complex expression
+      Z = X + Y * 2 - 10
+
+C     Test with real numbers
+      C = 3.14 + 2.5 * 1.8
+
+C     Test nested expressions
+      D = (C + 2.0) * (X - 5)
+
+C     ============================================
+C     CASOS IF-THEN-ELSE (del notebook AS_IF)
+C     ============================================
+
+C     Test simple IF with relational operator
+      IF (X .GT. 10) THEN
+        PRINT *, 'X is greater than 10'
+      ENDIF
+
+C     Test IF-ELSE
+      IF (X .GT. 10) THEN
+        PRINT *, 'X is greater than 10'
+      ELSE
+        PRINT *, 'X is less than or equal to 10'
+      ENDIF
+
+C     Test nested IF (ejemplo del notebook)
+      IF (X .EQ. Y) THEN
+        IF (A .NE. B) THEN
+          Z = 1
+        ENDIF
+      ENDIF
+
+C     Test IF-ELSE anidados con multiples niveles
+      IF (X .LT. Y) THEN
+        A = 1
+      ELSE
+        IF (Y .GT. Z) THEN
+          A = 2
+        ELSE
+          A = 3
+        ENDIF
+      ENDIF
+
+C     Test "dangling else" resuelto con ENDIF
+C     Este caso demuestra como ENDIF elimina ambiguedad
+      IF (X .GT. 0) THEN
+        IF (Y .GT. 0) THEN
+          PRINT *, 'Both positive'
+        ELSE
+          PRINT *, 'X positive, Y non-positive'
+        ENDIF
+      ELSE
+        PRINT *, 'X non-positive'
+      ENDIF
+
+C     Test IF con asignacion dentro (similar a ejemplos profesor)
+      IF (X .EQ. Y) THEN
+        Z = 100
+      ELSE
+        A = 200
+      ENDIF
+
+C     Test todos los operadores relacionales
+      IF (A .GT. B) THEN
+        X = 1
+      ENDIF
+
+      IF (A .LT. B) THEN
+        X = 2
+      ENDIF
+
+      IF (A .EQ. B) THEN
+        X = 3
+      ENDIF
+
+      IF (A .NE. B) THEN
+        X = 4
+      ENDIF
+
+      IF (A .GE. B) THEN
+        X = 5
+      ENDIF
+
+      IF (A .LE. B) THEN
+        X = 6
+      ENDIF
+
+C     ============================================
+C     CASOS DO LOOP (caracteristica adicional)
+C     ============================================
+
+C     Test DO loop with expression
+      DO 100 X = 1, 10, 2
+        Y = X * 2 + 5
+100   CONTINUE
+
+C     Test DO loop con IF anidado
+      DO 200 X = 1, 5
+        IF (X .GT. 3) THEN
+          Y = X * 10
+        ELSE
+          Y = X
+        ENDIF
+200   CONTINUE
+
+      END
+
